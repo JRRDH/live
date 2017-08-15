@@ -94,59 +94,6 @@
             // 获取数据
             var playUrl = 'http://wqs.jd.com/promote/superfestival/superfestival.mp4',
                 title = '';
-            var getData = function(_callback) {
-                var invitation = getUrlParams('invitation'),
-                    distinguish = getUrlParams('distinguish'),
-                    token = '';
-                $.ajax({
-                    url: 'http://slave.homed.me/account/get_access_token',
-                    type: 'post',
-                    data: JSON.stringify({
-                        "role": "guest",
-                        "deviceno": "12345678900",
-                        "deviceType": "yuj"
-                    }),
-                    error: function() {
-                        tool.layerAlertBack('服务器异常', function() {
-                            location.replace('index.html');
-                        });
-                    },
-                    complete: function(data) {
-                        data = JSON.parse(data.response);
-                        token = data.accessToken;
-                        $.ajax({
-                            url: 'http://192.168.101.30:8080/VCBMS3.0/terminalController/queryChannelId',
-                            dataType: 'json',
-                            data: {
-                                idCode: distinguish,
-                                inviteCode: invitation
-                            },
-                            success: function(data) {
-                                if(data.result == 'E0000') { // 正常请求
-                                    var id = data.msg.channelId;
-                                    playUrl = 'http://httpdvb.slave.homed.me:13164/playurl?accesstoken='+token+'&verifycode=3000425652&playtoken=ABCDEFGHIGK&programid='+id+'&playtype=live&protocol=hls';
-                                    var html = '<video id="video" src="'+playUrl+'" style="object-fit: fill;" autoplay playsinline webkit-playsinline="true" x5-video-player-type="h5" x5-video-player-fullscreen="true" width=1 height=1 x-webkit-airplay="true" x5-video-orientation="portraint" x5-video-ignore-metadata="true"></video>';
-                                    $('.playDiv').prepend(html);
-                                    document.getElementById('video').addEventListener("x5videoexitfullscreen", function(){
-                                        $('.play').show();
-                                    });
-                                    $('title').text(data.msg.name);
-                                    _callback && _callback();
-                                }else { // 异常打印
-                                    tool.layerAlertBack('获取会议地址失败', function() {
-                                        location.replace('index.html');
-                                    });
-                                }
-                            },
-                            error: function() {
-                                tool.layerAlertBack('服务器异常', function() {
-                                    location.replace('index.html');
-                                });
-                            }
-                        });
-                    }
-                });
-            }
 
             // 阻止除消息模块外浏览器其他部分滚动，防止微信露底
             var overscroll = function(el) {
@@ -184,21 +131,12 @@
             var alowPlay = function() {
                 $('.play').on('touchstart, click', function() {
                     $(this).hide();
-                    // 如果没有数据显获取数据
-                    if (playUrl === '') {
-                        tool.layerLoading();
-                        getData(function() {
-                            play();
-                            tool.closeLayer();
-                        });
-                    } else {
-                        var html = '<video id="video" src="'+playUrl+'" style="object-fit: fill;" autoplay playsinline webkit-playsinline="true" x5-video-player-type="h5" x5-video-player-fullscreen="true" width=1 height=1 x-webkit-airplay="true" x5-video-orientation="portraint" x5-video-ignore-metadata="true"></video>';
-                        $('.playDiv').prepend(html);
-                        document.getElementById('video').addEventListener("x5videoexitfullscreen", function(){
-                            $('.play').show();
-                        });
-                        play();
-                    }
+                    var html = '<video id="video" src="'+playUrl+'" style="object-fit: fill;" autoplay playsinline webkit-playsinline="true" x5-video-player-type="h5" x5-video-player-fullscreen="true" width=1 height=1 x-webkit-airplay="true" x5-video-orientation="portraint" x5-video-ignore-metadata="true"></video>';
+                    $('.playDiv').prepend(html);
+                    document.getElementById('video').addEventListener("x5videoexitfullscreen", function(){
+                        $('.play').show();
+                    });
+                    play();
                 });
             };
 
